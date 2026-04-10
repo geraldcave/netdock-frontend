@@ -78,17 +78,24 @@ export default function BookRoom() {
 
   return (
     <div className="flex flex-col min-h-screen lg:h-screen w-full bg-[#fcfcfd] overflow-x-hidden lg:overflow-hidden font-sans">
-      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-4 md:px-8 border-b border-[#CCAA49]/20 z-50">
-        <div className="flex items-center gap-10">
-          <Link to="/" className="text-[#CCAA49] text-2xl font-black tracking-tighter italic">
-            NetDock
-          </Link>
-          <div className="hidden md:flex gap-6 text-[10px] font-black uppercase tracking-widest">
+      <nav className="h-auto md:h-16 flex-none bg-[#1A2634] text-white flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-4 md:py-0 border-b border-[#CCAA49]/20 z-50 shadow-md gap-4 md:gap-0">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-10">
+          <div className="flex justify-between items-center w-full md:w-auto">
+            <Link to="/" className="text-[#CCAA49] text-2xl font-black tracking-tighter italic">
+              NetDock
+            </Link>
+            {token && role === "admin" ? (
+              <button onClick={handleLogout} className="md:hidden text-[10px] font-black uppercase bg-red-900/40 px-4 py-2 hover:bg-red-600 transition">Logout</button>
+            ) : (
+              <Link to="/login" className="md:hidden text-[10px] font-black uppercase bg-[#123765] px-3 py-2 border border-[#CCAA49]/30 mt-0">Login</Link>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest">
             <Link to="/" className="hover:text-[#CCAA49] transition">Submit Ticket</Link>
             <Link to="/book-room" className="text-[#CCAA49] border-b-2 border-[#CCAA49] pb-1">Book a Room!</Link>
           </div>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="hidden md:flex gap-4 items-center">
           {token && role === "admin" ? (
             <button onClick={handleLogout} className="text-[10px] font-black uppercase bg-red-900/40 px-4 py-2 hover:bg-red-600 transition">Logout</button>
           ) : (

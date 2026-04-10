@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
+import { motion } from "framer-motion";
 
 export default function AllTickets() {
   const navigate = useNavigate();
@@ -46,24 +47,27 @@ export default function AllTickets() {
   });
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#fcfcfd] overflow-hidden font-sans antialiased">
+    <div className="flex flex-col min-h-screen lg:h-screen w-full bg-[#fcfcfd] overflow-x-hidden lg:overflow-hidden font-sans antialiased">
       {/* --- SHARED IT NAVBAR --- */}
-      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-8 border-b border-[#CCAA49]/20 z-50">
-        <div className="flex items-center gap-10">
-          <Link to="/admin/tickets" className="text-[#CCAA49] text-2xl font-black tracking-tighter italic">NetDock</Link>
-          <div className="hidden md:flex gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+      <nav className="h-auto md:h-16 flex-none bg-[#1A2634] text-white flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-4 md:py-0 border-b border-[#CCAA49]/20 z-50 gap-4 md:gap-0">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-10">
+          <div className="flex justify-between items-center w-full md:w-auto">
+            <Link to="/admin/tickets" className="text-[#CCAA49] text-2xl font-black tracking-tighter italic">NetDock</Link>
+            <button onClick={handleLogout} className="md:hidden text-[10px] font-black uppercase bg-red-900/40 px-4 py-2 hover:bg-red-600 transition">Logout</button>
+          </div>
+          <div className="flex flex-wrap gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
             <Link to="/admin/tickets" className="hover:text-white transition">Active Tickets</Link>
             <Link to="/admin/tasks" className="hover:text-white transition">Task Manager</Link>
             <Link to="/admin/all-tickets" className="text-[#CCAA49] border-b-2 border-[#CCAA49] pb-1">All Tickets</Link>
           </div>
         </div>
-        <button onClick={handleLogout} className="text-[10px] font-black uppercase bg-red-900/40 px-4 py-2 hover:bg-red-600 transition">Logout</button>
+        <button onClick={handleLogout} className="hidden md:block text-[10px] font-black uppercase bg-red-900/40 px-4 py-2 hover:bg-red-600 transition">Logout</button>
       </nav>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 lg:overflow-hidden">
         {/* --- SIDEBAR: ANALYTICS & SEARCH --- */}
-        <aside className="w-[400px] h-full bg-white border-r border-gray-200 flex flex-col shadow-2xl z-30 overflow-hidden">
-          <div className="p-10 pb-6">
+        <aside className="w-full lg:w-[400px] lg:h-full bg-white border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col shadow-lg z-30 lg:overflow-hidden flex-none">
+          <div className="p-6 md:p-10 pb-4 md:pb-6">
             <div className="w-12 h-1 bg-[#CCAA49] mb-6"></div>
             <h1 className="text-3xl font-black text-[#1A2634] tracking-tighter italic leading-none">Global <br /> Archive</h1>
             <p className="text-[10px] text-gray-400 font-bold mt-3 uppercase tracking-[0.4em] flex items-center gap-2">
@@ -71,7 +75,7 @@ export default function AllTickets() {
             </p>
           </div>
 
-          <div className="flex-1 px-10 pb-10 space-y-8 overflow-y-auto custom-scrollbar pt-4">
+          <div className="flex-1 px-6 md:px-10 pb-8 md:pb-10 space-y-8 lg:overflow-y-auto custom-scrollbar pt-4">
             {/* Stats Dashboard */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-[#1A2634] p-4 border-l-4 border-[#CCAA49]">
@@ -136,25 +140,31 @@ export default function AllTickets() {
         </aside>
 
         {/* --- MAIN: FULL RECORD LIST --- */}
-        <main className="flex-1 h-full flex flex-col bg-[#f8fafc]">
-          <header className="px-10 py-8 bg-white border-b border-gray-100 flex justify-between items-end">
+        <main className="flex-1 lg:h-full flex flex-col bg-[#f8fafc]">
+          <header className="px-6 py-6 md:px-10 md:py-8 bg-white border-b border-gray-100 flex justify-between items-end">
             <div>
               <h2 className="text-4xl font-black text-[#1A2634] tracking-tighter italic uppercase leading-none">Record Stream</h2>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.4em] mt-2">Showing {filteredTickets.length} results from master database</p>
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+          <div className="flex-1 lg:overflow-y-auto p-6 md:p-10 custom-scrollbar">
             <div className="grid grid-cols-1 gap-4">
               {filteredTickets.length === 0 ? (
                 <div className="py-20 text-center opacity-40 uppercase font-black tracking-[0.5em] text-gray-400">Zero matches found in archive</div>
               ) : (
-                filteredTickets.map((ticket) => (
-                  <article key={ticket.id} className="bg-white border border-gray-100 flex items-center p-6 shadow-sm hover:shadow-md transition-all group">
-                    <div className={`w-1 h-12 ${ticket.status === 'Urgent' ? 'bg-red-500' : 'bg-gray-200'}`}></div>
+                filteredTickets.map((ticket, index) => (
+                  <motion.article 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                    key={ticket.id} 
+                    className="bg-white border border-gray-100 flex flex-col md:flex-row items-start md:items-center p-4 md:p-6 shadow-sm hover:shadow-md transition-all group gap-4 md:gap-0"
+                  >
+                    <div className={`hidden md:block w-1 h-12 ${ticket.status === 'Urgent' ? 'bg-red-500' : 'bg-gray-200'}`}></div>
                     
-                    <div className="flex-1 px-6 grid grid-cols-4 items-center gap-6">
-                      <div>
+                    <div className="flex-1 w-full md:px-6 grid grid-cols-2 md:grid-cols-4 items-start md:items-center gap-4 md:gap-6">
+                      <div className={`md:border-none border-l-4 pl-3 md:pl-0 ${ticket.status === 'Urgent' ? 'border-red-500' : 'border-gray-200'}`}>
                         <p className="text-[8px] font-black text-gray-300 uppercase">Requester</p>
                         <p className="text-xs font-black text-[#1A2634] truncate">{ticket.name}</p>
                       </div>
@@ -166,7 +176,7 @@ export default function AllTickets() {
                         <p className="text-[8px] font-black text-gray-300 uppercase">Current State</p>
                         <p className="text-[10px] font-black text-[#123765] uppercase">{ticket.status}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left md:text-right">
                          <p className="text-[8px] font-black text-gray-300 uppercase">Submission</p>
                          <p className="text-[10px] font-mono text-gray-400">{new Date(ticket.created_at).toLocaleDateString()}</p>
                       </div>
@@ -174,11 +184,11 @@ export default function AllTickets() {
 
                     <Link 
                       to="/admin/tickets" 
-                      className="px-6 py-2 border border-gray-100 text-[9px] font-black uppercase text-gray-400 hover:text-[#CCAA49] hover:border-[#CCAA49] transition-all"
+                      className="w-full md:w-auto text-center px-6 py-3 md:py-2 border border-gray-100 text-[9px] font-black uppercase text-gray-400 hover:text-[#CCAA49] hover:border-[#CCAA49] transition-all mt-2 md:mt-0"
                     >
                       View Details
                     </Link>
-                  </article>
+                  </motion.article>
                 ))
               )}
             </div>
