@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
+import { motion } from "framer-motion";
 
 export default function AdminTasks() {
   const navigate = useNavigate();
@@ -120,9 +121,9 @@ export default function AdminTasks() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#fcfcfd] overflow-hidden font-sans antialiased">
+    <div className="flex flex-col min-h-screen lg:h-screen w-full bg-[#fcfcfd] overflow-x-hidden lg:overflow-hidden font-sans antialiased">
       {/* --- NAVBAR --- */}
-      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-8 border-b border-[#CCAA49]/20 z-50 shadow-md">
+      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-4 md:px-8 border-b border-[#CCAA49]/20 z-50 shadow-md">
         <div className="flex items-center gap-10">
           <Link
             to="/admin/tickets"
@@ -159,11 +160,11 @@ export default function AdminTasks() {
         </button>
       </nav>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 lg:overflow-hidden">
         {/* --- SIDEBAR: TASK CREATOR --- */}
-        <aside className="w-[400px] h-full bg-white border-r border-gray-200 flex flex-col shadow-2xl z-30 overflow-hidden">
+        <aside className="w-full lg:w-[400px] lg:h-full bg-white border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col shadow-lg z-30 lg:overflow-hidden flex-none">
           {/* Header Section */}
-          <div className="p-10 pb-6">
+          <div className="p-6 md:p-10 pb-4 md:pb-6">
             <div className="w-12 h-1 bg-[#CCAA49] mb-6"></div>
             <h1 className="text-3xl font-black text-[#1A2634] tracking-tighter italic leading-none">
               Task <br /> Assignment
@@ -175,9 +176,12 @@ export default function AdminTasks() {
           </div>
 
           {/* Form Section */}
-          <form
+          <motion.form
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
             onSubmit={handleSubmit}
-            className="flex-1 px-10 pb-10 space-y-6 overflow-y-auto custom-scrollbar pt-4"
+            className="flex-1 px-6 md:px-10 pb-8 md:pb-10 space-y-6 lg:overflow-y-auto custom-scrollbar pt-4"
           >
             {/* Task Name (task_name) */}
             <div className="flex flex-col gap-2 group">
@@ -321,7 +325,7 @@ export default function AdminTasks() {
                 Initialize Task
               </button>
             </div>
-          </form>
+          </motion.form>
 
           <style
             dangerouslySetInnerHTML={{
@@ -355,8 +359,8 @@ export default function AdminTasks() {
         </aside>
 
         {/* --- MAIN FEED: TASK STREAM --- */}
-        <main className="flex-1 h-full flex flex-col bg-[#f8fafc]">
-          <header className="px-10 py-8 bg-white border-b border-gray-100 flex justify-between items-end">
+        <main className="flex-1 lg:h-full flex flex-col bg-[#f8fafc]">
+          <header className="px-6 py-6 md:px-10 md:py-8 bg-white border-b border-gray-100 flex justify-between items-end">
             <div>
               <h2 className="text-4xl font-black text-[#1A2634] tracking-tighter italic uppercase leading-none">
                 IT Updates
@@ -375,10 +379,13 @@ export default function AdminTasks() {
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {tasks.map((task) => (
-                <article
+          <div className="flex-1 lg:overflow-y-auto p-6 md:p-10 custom-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+              {tasks.map((task, index) => (
+                <motion.article
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
                   key={task.id}
                   className="bg-white border border-gray-200 p-8 shadow-sm hover:shadow-xl transition-all relative flex flex-col"
                 >
@@ -442,7 +449,7 @@ export default function AdminTasks() {
                       <option value="delayed">Delayed</option>
                     </select>
                   </div>
-                </article>
+                </motion.article>
               ))}
             </div>
           </div>

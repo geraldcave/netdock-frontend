@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
+import { motion } from 'framer-motion';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -38,7 +39,12 @@ export default function Login() {
         <div className="min-h-screen w-full bg-[#f8fafc] flex flex-col md:flex-row font-sans antialiased">
             
             {/* LEFT SIDE: Visual Brand Area (Hidden on mobile) */}
-            <div className="hidden md:flex md:w-5/12 bg-[#1A2634] p-16 flex-col justify-between relative overflow-hidden">
+            <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="hidden md:flex md:w-5/12 bg-[#1A2634] p-16 flex-col justify-between relative overflow-hidden"
+            >
                 {/* Subtle Decorative Background Element */}
                 <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-[#CCAA49] opacity-5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-[#123765] opacity-20 rounded-full blur-3xl"></div>
@@ -63,10 +69,15 @@ export default function Login() {
                     {/* Internal Operations Secure */}
                     <Link to="/" className="hover:text-white transition">Dashboard</Link>
                 </div>
-            </div>
+            </motion.div>
 
             {/* RIGHT SIDE: Authentication Form */}
-            <div className="flex-1 flex items-center justify-center p-8 md:p-24 bg-white">
+            <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex-1 flex items-center justify-center p-8 md:p-24 bg-white"
+            >
                 <div className="w-full max-w-md">
                     
                     <header className="mb-12">
@@ -146,7 +157,7 @@ export default function Login() {
                         </div>
                     </footer>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

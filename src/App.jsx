@@ -1,5 +1,6 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { AnimatePresence, motion } from "framer-motion";
 
 // --- PAGE IMPORTS ---
 import Login from "./pages/Login";
@@ -20,55 +21,72 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default function App() {
+const PageTransition = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans antialiased">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="w-full h-full flex flex-col flex-1"
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+export default function App() {
+  const location = useLocation();
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans antialiased">
       <Helmet>
         <title>NetDock | Gerald Solo</title>
       </Helmet>
 
-      <Routes>
-        {/* --- PUBLIC ROUTES --- */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<SubmitTicket />} />
-        <Route path="/book-room" element={<BookRoom />} />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* --- PUBLIC ROUTES --- */}
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/" element={<PageTransition><SubmitTicket /></PageTransition>} />
+          <Route path="/book-room" element={<PageTransition><BookRoom /></PageTransition>} />
 
-        {/* --- ADMIN ROUTES (IT PERSONNEL ONLY) --- */}
-        <Route
-          path="/admin/tickets"
-          element={
-            <ProtectedRoute>
-              <AdminTickets />
-            </ProtectedRoute>
-          }
-        />
+          {/* --- ADMIN ROUTES (IT PERSONNEL ONLY) --- */}
+          <Route
+            path="/admin/tickets"
+            element={
+              <ProtectedRoute>
+                <PageTransition><AdminTickets /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* If you are using the AdminTickets code I gave you previously, 
-          tasks are ALREADY integrated there. If you want a separate page, 
-          make sure you create AdminTasks.jsx and uncomment the import above.
-        */}
-        <Route
-          path="/admin/tasks"
-          element={
-            <ProtectedRoute>
-              <AdminTasks />
-            </ProtectedRoute>
-          }
-        />
+          {/* If you are using the AdminTickets code I gave you previously, 
+            tasks are ALREADY integrated there. If you want a separate page, 
+            make sure you create AdminTasks.jsx and uncomment the import above.
+          */}
+          <Route
+            path="/admin/tasks"
+            element={
+              <ProtectedRoute>
+                <PageTransition><AdminTasks /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/all-tickets"
-          element={
-            <ProtectedRoute>
-              <AllTickets />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/all-tickets"
+            element={
+              <ProtectedRoute>
+                <PageTransition><AllTickets /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* --- FALLBACK REDIRECT --- */}
-        {/* Important: Keep only one '*' route at the very bottom */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          {/* --- FALLBACK REDIRECT --- */}
+          {/* Important: Keep only one '*' route at the very bottom */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </AnimatePresence>
     </div>
   );
 }

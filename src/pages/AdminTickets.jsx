@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
+import { motion } from "framer-motion";
 
 export default function AdminTickets() {
   const navigate = useNavigate();
@@ -64,8 +65,8 @@ export default function AdminTickets() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#fcfcfd] overflow-hidden font-sans antialiased">
-      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-8 border-b border-[#CCAA49]/20 z-50 shadow-md">
+    <div className="flex flex-col min-h-screen lg:h-screen w-full bg-[#fcfcfd] overflow-x-hidden lg:overflow-hidden font-sans antialiased">
+      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-4 md:px-8 border-b border-[#CCAA49]/20 z-50 shadow-md">
         <div className="flex items-center gap-10">
           <Link to="/admin/tickets" className="text-[#CCAA49] text-2xl font-black tracking-tighter italic">NetDock</Link>
           <div className="hidden md:flex gap-6 text-[10px] font-black uppercase tracking-widest">
@@ -79,9 +80,9 @@ export default function AdminTickets() {
         </button>
       </nav>
 
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="w-[350px] h-full bg-white border-r border-gray-200 flex flex-col shadow-2xl z-30 overflow-hidden">
-          <div className="p-10 pb-6">
+      <div className="flex flex-col lg:flex-row flex-1 lg:overflow-hidden">
+        <aside className="w-full lg:w-[350px] lg:h-full bg-white border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col shadow-lg z-30 lg:overflow-hidden flex-none">
+          <div className="p-6 md:p-10 pb-4 md:pb-6">
             <div className="w-12 h-1 bg-[#CCAA49] mb-6"></div>
             <h1 className="text-3xl font-black text-[#1A2634] tracking-tighter italic leading-none">Admin <br /> Console</h1>
             <p className="text-[10px] text-gray-400 font-bold mt-3 uppercase tracking-[0.4em] flex items-center gap-2">
@@ -89,7 +90,7 @@ export default function AdminTickets() {
             </p>
           </div>
 
-          <div className="flex-1 px-10 space-y-8 overflow-y-auto custom-scrollbar pt-4">
+          <div className="flex-1 px-6 md:px-10 pb-8 md:pb-10 space-y-8 lg:overflow-y-auto custom-scrollbar pt-4">
             <div className="grid grid-cols-1 gap-4">
               <div className="bg-[#1A2634] p-5 border-l-4 border-[#CCAA49]">
                 <p className="text-[9px] font-black text-[#CCAA49] uppercase tracking-widest">Active Queue</p>
@@ -134,21 +135,27 @@ export default function AdminTickets() {
           </div>
         </aside>
 
-        <main className="flex-1 h-full flex flex-col bg-[#f8fafc]">
-          <header className="px-10 py-8 bg-white border-b border-gray-100 flex justify-between items-end">
+        <main className="flex-1 lg:h-full flex flex-col bg-[#f8fafc]">
+          <header className="px-6 py-6 md:px-10 md:py-8 bg-white border-b border-gray-100 flex justify-between items-end">
             <div>
               <h2 className="text-4xl font-black text-[#1A2634] tracking-tighter italic uppercase">Operation Stream</h2>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.4em] mt-2">Managing {filteredTickets.length} active dispatches</p>
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+          <div className="flex-1 lg:overflow-y-auto p-6 md:p-10 custom-scrollbar">
             <div className="space-y-6">
               {filteredTickets.length === 0 ? (
                 <div className="py-20 text-center border-4 border-dashed border-gray-200 opacity-50 uppercase font-black tracking-widest text-gray-400">No active tickets found</div>
               ) : (
-                filteredTickets.map((ticket) => (
-                  <article key={ticket.id} className="bg-white border border-gray-200 flex flex-col md:flex-row shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+                filteredTickets.map((ticket, index) => (
+                  <motion.article 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                    key={ticket.id} 
+                    className="bg-white border border-gray-200 flex flex-col md:flex-row shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+                  >
                     <div className={`w-1.5 h-full absolute left-0 top-0 ${statusColors[ticket.status]?.split(' ')[0]}`}></div>
                     
                     <div className="flex-1 p-8 ml-2">
@@ -188,7 +195,7 @@ export default function AdminTickets() {
                         </select>
                       </div>
                     </div>
-                  </article>
+                  </motion.article>
                 ))
               )}
             </div>

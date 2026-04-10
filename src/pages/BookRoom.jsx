@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
+import { motion } from "framer-motion";
 
 export default function BookRoom() {
   const navigate = useNavigate();
@@ -26,7 +27,13 @@ export default function BookRoom() {
   const filteredBookings = bookings.filter((booking) => {
     const matchesDate = filterDate === "" || booking.booking_date === filterDate;
     const matchesRoom = filterRoomId === "" || booking.room_id.toString() === filterRoomId;
-    return matchesDate && matchesRoom;
+    
+    // Check if the booking's end time is still in the future (or currently active)
+    const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
+    const now = new Date();
+    const isNotPassed = endDateTime > now;
+
+    return matchesDate && matchesRoom && isNotPassed;
   });
 
   useEffect(() => {
@@ -70,8 +77,8 @@ export default function BookRoom() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#fcfcfd] overflow-hidden font-sans">
-      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-8 border-b border-[#CCAA49]/20 z-50">
+    <div className="flex flex-col min-h-screen lg:h-screen w-full bg-[#fcfcfd] overflow-x-hidden lg:overflow-hidden font-sans">
+      <nav className="h-16 flex-none bg-[#1A2634] text-white flex items-center justify-between px-4 md:px-8 border-b border-[#CCAA49]/20 z-50">
         <div className="flex items-center gap-10">
           <Link to="/" className="text-[#CCAA49] text-2xl font-black tracking-tighter italic">
             NetDock
@@ -90,9 +97,9 @@ export default function BookRoom() {
         </div>
       </nav>
 
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="w-[400px] h-full bg-white border-r border-gray-200 flex flex-col shadow-2xl z-30 overflow-hidden">
-          <div className="p-10 pb-6">
+      <div className="flex flex-col lg:flex-row flex-1 lg:overflow-hidden">
+        <aside className="w-full lg:w-[400px] lg:h-full bg-white border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col shadow-lg lg:shadow-2xl z-30 lg:overflow-hidden flex-none">
+          <div className="p-6 md:p-10 pb-4 md:pb-6">
             <div className="w-12 h-1 bg-[#CCAA49] mb-6"></div>
             <h1 className="text-3xl font-black text-[#1A2634] tracking-tighter italic leading-none">
               Room  Reservation
@@ -103,7 +110,13 @@ export default function BookRoom() {
             </p> */}
           </div>
 
-          <form onSubmit={handleBooking} className="flex-1 px-10 pb-10 space-y-7 overflow-y-auto custom-scrollbar pt-4">
+          <motion.form 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            onSubmit={handleBooking} 
+            className="flex-1 px-6 md:px-10 pb-8 md:pb-10 space-y-7 lg:overflow-y-auto custom-scrollbar pt-4"
+          >
             <div className="flex flex-col gap-2 group">
               <label className="text-[9px] font-black text-gray-400 tracking-[0.2em] ml-1 group-focus-within:text-[#CCAA49] transition-colors">
                 Occupant Personnel
@@ -192,11 +205,11 @@ export default function BookRoom() {
                 System v1
               </p>
             </div>
-          </form>
+          </motion.form>
         </aside>
 
-        <main className="flex-1 h-full flex flex-col bg-[#f8fafc]">
-          <header className="px-10 py-6 bg-white border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <main className="flex-1 lg:h-full flex flex-col bg-[#f8fafc]">
+          <header className="px-6 md:px-10 py-6 bg-white border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
             <div>
               <h2 className="text-3xl font-black text-[#1A2634] tracking-tighter italic">Active Leases</h2>
               <p className="text-[10px] text-gray-400 font-bold tracking-[0.3em] mt-2">Currently Reserved Resources</p>
@@ -234,15 +247,21 @@ export default function BookRoom() {
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+          <div className="flex-1 lg:overflow-y-auto p-6 md:p-10 custom-scrollbar">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredBookings.length === 0 ? (
                 <div className="col-span-full py-20 text-center border-4 border-dashed border-gray-100 opacity-40">
                   <p className="font-black text-gray-300 tracking-[0.5em]">No Matching Schedules Found</p>
                 </div>
               ) : (
-                filteredBookings.map((booking) => (
-                  <article key={booking.id} className="bg-white border border-gray-200 p-6 shadow-sm hover:shadow-xl transition-all relative group">
+                filteredBookings.map((booking, index) => (
+                  <motion.article 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                    key={booking.id} 
+                    className="bg-white border border-gray-200 p-6 shadow-sm hover:shadow-xl transition-all relative group"
+                  >
                     <div className="absolute top-0 left-0 w-1 h-full bg-[#CCAA49]"></div>
                     <div className="flex justify-between items-start mb-4">
                       <span className="text-[10px] font-black text-gray-400 tracking-widest">
@@ -265,7 +284,7 @@ export default function BookRoom() {
                         <span className="text-[#CCAA49]">{booking.start_time} - {booking.end_time}</span>
                       </div>
                     </div>
-                  </article>
+                  </motion.article>
                 ))
               )}
             </div>
