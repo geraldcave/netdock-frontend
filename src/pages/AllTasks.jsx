@@ -3,26 +3,25 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
 import { motion } from "framer-motion";
 
-export default function AllTickets() {
+export default function AllTasks() {
   const navigate = useNavigate();
-  const [tickets, setTickets] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [deptFilter, setDeptFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
   useEffect(() => {
-    fetchTickets();
+    fetchTasks();
   }, []);
 
-  const fetchTickets = async () => {
+  const fetchTasks = async () => {
     try {
       setIsLoading(true);
-      const res = await api.get("/tickets");
-      setTickets(res.data);
+      const res = await api.get("/tasks");
+      setTasks(res.data);
     } catch (err) { console.error("Archive fetch failed:", err); }
     finally { setIsLoading(false); }
   };
@@ -34,27 +33,24 @@ export default function AllTickets() {
 
   // Stats
   const stats = {
-    total: tickets.length,
-    urgent: tickets.filter(t => t.status === "Urgent").length,
-    resolved: tickets.filter(t => t.status === "Resolved" || t.status === "Closed").length,
+    total: tasks.length,
+    completed: tasks.filter(t => t.status === "completed").length,
+    delayed: tasks.filter(t => t.status === "delayed").length,
   };
 
   // Filters
-  const filteredTickets = tickets.filter((t) => {
+  const filteredTasks = tasks.filter((t) => {
     const term = searchTerm.toLowerCase();
-    const matchesSearch = t.name.toLowerCase().includes(term) || t.ticket_about.toLowerCase().includes(term);
+    const matchesSearch = t.task_name.toLowerCase().includes(term) || (t.description && t.description.toLowerCase().includes(term));
     const matchesStatus = statusFilter === "" || t.status === statusFilter;
-    const matchesDept = deptFilter === "" || t.department === deptFilter;
-    return matchesSearch && matchesStatus && matchesDept;
+    return matchesSearch && matchesStatus;
   });
 
   const statusColors = {
-    Urgent: { bg: "bg-[#1A2634]", text: "text-white" },
-    High: { bg: "bg-[#CCAA49]", text: "text-white" },
-    Medium: { bg: "bg-[#123765]", text: "text-white" },
-    Low: { bg: "bg-gray-400", text: "text-white" },
-    Resolved: { bg: "bg-green-600", text: "text-white" },
-    Closed: { bg: "bg-black", text: "text-white" },
+    pending: { bg: "bg-gray-400", text: "text-white" },
+    in_progress: { bg: "bg-[#123765]", text: "text-white" },
+    completed: { bg: "bg-green-600", text: "text-white" },
+    delayed: { bg: "bg-red-600", text: "text-white" },
   };
 
   return (
@@ -70,7 +66,7 @@ export default function AllTickets() {
             <Link to="/" className="text-white text-2xl font-black tracking-tighter italic">
               Net<span className="text-[#CCAA49]">Dock</span>
             </Link>
-            <span className="px-2 py-1 bg-[#CCAA49]/20 text-[#CCAA49] text-[9px] font-black uppercase tracking-widest rounded">Archive</span>
+            <span className="px-2 py-1 bg-[#CCAA49]/20 text-[#CCAA49] text-[9px] font-black uppercase tracking-widest rounded">Task Archive</span>
           </div>
           
           <div className="space-y-8 flex-1">
@@ -82,9 +78,9 @@ export default function AllTickets() {
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#CCAA49]">Total</span>
                   <span className="text-2xl font-black text-white leading-none mt-1">{stats.total}</span>
                 </div>
-                <div className="bg-red-900/20 border border-red-900/50 p-3 rounded-xl flex flex-col justify-center items-start">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-red-400">Urgent</span>
-                  <span className="text-2xl font-black text-white leading-none mt-1">{stats.urgent}</span>
+                <div className="bg-green-900/40 border border-green-900/50 p-3 rounded-xl flex flex-col justify-center items-start">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Done</span>
+                  <span className="text-2xl font-black text-white leading-none mt-1">{stats.completed}</span>
                 </div>
               </div>
             </div>
@@ -93,7 +89,7 @@ export default function AllTickets() {
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-3">
                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Query Parameters</h4>
-                 <button onClick={() => {setSearchTerm(""); setStatusFilter(""); setDeptFilter("");}} className="text-[9px] font-black text-[#CCAA49] uppercase tracking-widest hover:text-white transition-colors">Clear</button>
+                 <button onClick={() => {setSearchTerm(""); setStatusFilter("");}} className="text-[9px] font-black text-[#CCAA49] uppercase tracking-widest hover:text-white transition-colors">Clear</button>
               </div>
               <div className="space-y-3">
                 <input 
@@ -103,16 +99,6 @@ export default function AllTickets() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <select 
-                  className="w-full bg-[#1A2634] border border-[#123765] text-white text-xs font-bold p-3 rounded-lg outline-none focus:border-[#CCAA49] transition-all appearance-none cursor-pointer"
-                  value={deptFilter} 
-                  onChange={(e) => setDeptFilter(e.target.value)}
-                >
-                  <option value="">ALL DEPARTMENTS</option>
-                  <option value="IT">IT DEPARTMENT</option>
-                  <option value="HR">HR DEPARTMENT</option>
-                  <option value="Finance">FINANCE DEPT</option>
-                </select>
                 
                 <select 
                   className="w-full bg-[#1A2634] border border-[#123765] text-white text-xs font-bold p-3 rounded-lg outline-none focus:border-[#CCAA49] transition-all appearance-none cursor-pointer"
@@ -120,12 +106,10 @@ export default function AllTickets() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
                   <option value="">ALL STATUSES</option>
-                  <option value="Urgent">URGENT</option>
-                  <option value="High">HIGH PRIORITY</option>
-                  <option value="Medium">MEDIUM</option>
-                  <option value="Low">LOW</option>
-                  <option value="Resolved">RESOLVED</option>
-                  <option value="Closed">CLOSED</option>
+                  <option value="pending">PENDING</option>
+                  <option value="in_progress">IN PROGRESS</option>
+                  <option value="completed">COMPLETED</option>
+                  <option value="delayed">DELAYED</option>
                 </select>
               </div>
             </div>
@@ -137,14 +121,14 @@ export default function AllTickets() {
                  <Link to="/admin/tickets" className="flex justify-between items-center text-sm font-medium text-gray-400 hover:text-white px-3 py-2.5 rounded-lg hover:bg-[#123765]/50 transition-colors text-left border border-transparent">
                     <span>Active Tickets</span>
                  </Link>
-                 <Link to="/admin/all-tickets" className="flex justify-between items-center text-sm font-bold text-[#1A2634] px-3 py-2.5 rounded-lg bg-[#CCAA49] text-left transition-all shadow-[0_0_15px_rgba(204,170,73,0.3)]">
-                    <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> All Tickets (Archive)</span>
+                 <Link to="/admin/all-tickets" className="flex justify-between items-center text-sm font-medium text-gray-400 hover:text-white px-3 py-2.5 rounded-lg hover:bg-[#123765]/50 transition-colors text-left border border-transparent">
+                    <span>All Tickets (Archive)</span>
                  </Link>
                  <Link to="/admin/tasks" className="flex justify-between items-center text-sm font-medium text-gray-400 hover:text-white px-3 py-2.5 rounded-lg hover:bg-[#123765]/50 transition-colors text-left border border-transparent">
                     <span>Task Manager</span>
                  </Link>
-                 <Link to="/admin/all-tasks" className="flex justify-between items-center text-sm font-medium text-gray-400 hover:text-white px-3 py-2.5 rounded-lg hover:bg-[#123765]/50 transition-colors text-left border border-transparent">
-                    <span>All Tasks</span>
+                 <Link to="/admin/all-tasks" className="flex justify-between items-center text-sm font-bold text-[#1A2634] px-3 py-2.5 rounded-lg bg-[#CCAA49] text-left transition-all shadow-[0_0_15px_rgba(204,170,73,0.3)]">
+                    <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> All Tasks</span>
                  </Link>
                </div>
             </div>
@@ -158,7 +142,7 @@ export default function AllTickets() {
         {/* Header */}
         <header className="px-6 lg:px-8 py-5 bg-white border-b border-gray-200 flex justify-between items-center shrink-0 shadow-sm z-10">
           <div className="flex items-center gap-4">
-             <h1 className="text-2xl font-black text-[#1A2634] uppercase italic tracking-tight">All Ticket Archive</h1>
+             <h1 className="text-2xl font-black text-[#1A2634] uppercase italic tracking-tight">All Task Archive</h1>
           </div>
           
           <div className="flex items-center gap-4 text-sm font-bold">
@@ -182,11 +166,11 @@ export default function AllTickets() {
         {/* Mobile Navigation */}
         <div className="lg:hidden flex items-center gap-2 px-6 py-3 bg-[#f8fafc] border-b border-gray-200 overflow-x-auto shadow-inner custom-scrollbar shrink-0 z-10 w-full">
           <Link to="/admin/tickets" className="text-xs font-bold text-gray-400 hover:text-[#1A2634] whitespace-nowrap px-4 py-2 transition-colors">Active Tickets</Link>
-          <Link to="/admin/all-tickets" className="text-xs font-black text-white whitespace-nowrap bg-[#1A2634] px-4 py-2 rounded-lg border border-[#CCAA49]/60 shadow-sm flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#CCAA49] animate-pulse"></span> All Tickets
-          </Link>
+          <Link to="/admin/all-tickets" className="text-xs font-bold text-gray-400 hover:text-[#1A2634] whitespace-nowrap px-4 py-2 transition-colors">All Tickets</Link>
           <Link to="/admin/tasks" className="text-xs font-bold text-gray-400 hover:text-[#1A2634] whitespace-nowrap px-4 py-2 transition-colors">Task Manager</Link>
-          <Link to="/admin/all-tasks" className="text-xs font-bold text-gray-400 hover:text-[#1A2634] whitespace-nowrap px-4 py-2 transition-colors">All Tasks</Link>
+          <Link to="/admin/all-tasks" className="text-xs font-black text-white whitespace-nowrap bg-[#1A2634] px-4 py-2 rounded-lg border border-[#CCAA49]/60 shadow-sm flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#CCAA49] animate-pulse"></span> All Tasks
+          </Link>
         </div>
 
         {/* Archive Ticket List */}
@@ -201,22 +185,22 @@ export default function AllTickets() {
                 />
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest animate-pulse">Syncing Database...</p>
               </div>
-            ) : filteredTickets.length === 0 ? (
+            ) : filteredTasks.length === 0 ? (
               <div className="py-24 text-center">
                 <p className="text-gray-400 font-black text-sm uppercase tracking-widest mb-2 opacity-50">Zero Matches Found</p>
                 <p className="text-xs text-gray-400 font-medium">No results found in the master database.</p>
               </div>
             ) : (
-              filteredTickets.map((ticket, index) => (
+              filteredTasks.map((task, index) => (
                 <motion.article 
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
-                  key={ticket.id} 
+                  key={task.id} 
                   className="bg-white border-y sm:border sm:rounded-xl border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow relative flex flex-col md:flex-row group"
                 >
                   {/* Left Status Color Strip */}
-                  <div className={`hidden sm:block w-1.5 shrink-0 ${statusColors[ticket.status]?.bg || "bg-gray-200"}`}></div>
+                  <div className={`hidden sm:block w-1.5 shrink-0 ${statusColors[task.status]?.bg || "bg-gray-200"}`}></div>
 
                   <div className="flex-1 flex flex-col md:flex-row min-w-0">
                     
@@ -225,42 +209,49 @@ export default function AllTickets() {
                       
                       {/* Mobile Top Strip */}
                       <div className="flex sm:hidden items-center gap-2 mb-3">
-                         <div className={`w-2 h-2 rounded-full ${statusColors[ticket.status]?.bg || "bg-gray-200"}`}></div>
-                         <span className="text-[10px] font-black uppercase tracking-widest text-[#1A2634]">{ticket.status}</span>
+                         <div className={`w-2 h-2 rounded-full ${statusColors[task.status]?.bg || "bg-gray-200"}`}></div>
+                         <span className="text-[10px] font-black uppercase tracking-widest text-[#1A2634]">{task.status.replace("_", " ")}</span>
                       </div>
 
                       <div className="flex justify-between items-start mb-1">
                         <div className="flex items-center gap-3 pr-4 min-w-0">
                            <span className="hidden sm:inline-flex text-[9px] font-black uppercase tracking-widest text-[#1A2634] border border-[#1A2634]/10 bg-gray-50 px-1.5 py-0.5 rounded">
-                             {ticket.status}
+                             {task.status.replace("_", " ")}
                            </span>
-                           <h3 className="font-black text-sm text-[#1A2634] truncate">{ticket.name}</h3>
+                           <h3 className="font-black text-sm text-[#1A2634] truncate">{task.task_name}</h3>
                         </div>
                         <span className="shrink-0 text-[10px] font-black text-gray-300 uppercase tracking-widest font-mono pt-1">
-                          #{ticket.id.toString().padStart(4, "0")}
+                          TSK-{task.id.toString().padStart(4, "0")}
                         </span>
                       </div>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-1 gap-x-4 mt-2">
                         <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Department</p>
-                          <p className="text-xs font-bold text-[#CCAA49] truncate">{ticket.department}</p>
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Assignee</p>
+                          <p className="text-xs font-bold text-[#CCAA49] truncate">{task.assigned_user?.name || `ID: ${task.assigned_user_id}`}</p>
                         </div>
-                        <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Contact</p>
-                          <p className="text-xs font-medium text-gray-700 truncate">{ticket.email}</p>
-                        </div>
-                        <div className="col-span-1 sm:col-span-2 lg:col-span-2">
-                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Date Created</p>
-                           <p className="text-xs font-bold text-[#1A2634]">{new Date(ticket.created_at).toLocaleString()}</p>
+                        <div className="col-span-1 md:col-span-1 lg:col-span-3">
+                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Timeframe</p>
+                           <p className="text-xs font-bold text-[#1A2634]">{new Date(task.start_date).toLocaleString()} — {new Date(task.end_date).toLocaleString()}</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Description Area */}
-                    <div className="w-full md:w-[40%] shrink-0 p-3 md:px-4 flex items-center bg-gray-50/30">
-                      <p className="text-xs text-gray-600 italic border-l-2 border-[#123765] pl-3 py-0.5 leading-snug line-clamp-2">"{ticket.ticket_about}"</p>
+                    <div className="w-full md:w-[40%] shrink-0 flex flex-col bg-gray-50/30">
+                      {/* Description Area */}
+                      <div className="p-3 md:px-4 flex-1 flex items-center">
+                        <p className="text-xs text-gray-600 italic border-l-2 border-[#123765] pl-3 py-0.5 leading-snug line-clamp-2">"{task.description || "No description."}"</p>
+                      </div>
+                      
+                      {/* Remarks Area */}
+                      {task.remarks && (
+                        <div className="p-3 md:px-4 bg-gray-50/80 flex items-center border-t border-gray-100 shrink-0">
+                          <p className="text-[9px] text-gray-400 font-black tracking-widest uppercase mr-2">Note:</p>
+                          <p className="text-[11px] text-[#1A2634] font-medium truncate">{task.remarks}</p>
+                        </div>
+                      )}
                     </div>
+
                   </div>
                 </motion.article>
               ))

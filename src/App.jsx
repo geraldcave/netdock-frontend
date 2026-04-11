@@ -9,6 +9,7 @@ import AdminTickets from "./pages/AdminTickets";
 import BookRoom from "./pages/BookRoom";
 import AdminTasks from "./pages/AdminTasks";
 import AllTickets from "./pages/AllTickets";
+import AllTasks from "./pages/AllTasks";
 
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children }) => {
@@ -78,6 +79,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PageTransition><AllTickets /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/all-tasks"
+            element={
+              <ProtectedRoute>
+                <PageTransition><AllTasks /></PageTransition>
               </ProtectedRoute>
             }
           />

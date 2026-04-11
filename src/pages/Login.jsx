@@ -78,7 +78,13 @@ export default function Login() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="flex-1 flex items-center justify-center p-8 md:p-24 bg-white"
             >
-                <div className="w-full max-w-md">
+                <div className="w-full max-w-md relative">
+                    
+                    {/* MOBILE ONLY BACK BUTTON */}
+                    <Link to="/" className="md:hidden flex items-center gap-2 text-[#CCAA49] font-black text-[10px] tracking-widest uppercase mb-12 hover:text-[#1A2634] transition-colors border border-[#CCAA49]/30 w-fit px-4 py-2 rounded-lg bg-[#CCAA49]/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        Return to Dashboard
+                    </Link>
                     
                     <header className="mb-12">
                         <h2 className="text-4xl font-black text-[#1A2634] tracking-tighter uppercase italic">
@@ -107,7 +113,7 @@ export default function Login() {
                                 value={email} 
                                 onChange={e => setEmail(e.target.value)}
                                 placeholder="ADMIN@SYSTEM.COM"
-                                className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-[#1A2634] outline-none focus:bg-white focus:border-[#CCAA49] focus:ring-4 focus:ring-[#CCAA49]/10 transition-all placeholder:text-gray-200"
+                                className="w-full px-5 py-4 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-bold text-[#1A2634] outline-none focus:bg-white focus:border-[#123765] focus:ring-4 focus:ring-[#123765]/10 shadow-sm transition-all placeholder:text-gray-300"
                             />
                         </div>
 
@@ -121,7 +127,7 @@ export default function Login() {
                                 value={password} 
                                 onChange={e => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-[#1A2634] outline-none focus:bg-white focus:border-[#CCAA49] focus:ring-4 focus:ring-[#CCAA49]/10 transition-all placeholder:text-gray-200"
+                                className="w-full px-5 py-4 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-bold text-[#1A2634] outline-none focus:bg-white focus:border-[#123765] focus:ring-4 focus:ring-[#123765]/10 shadow-sm transition-all placeholder:text-gray-300"
                             />
                         </div>
 
